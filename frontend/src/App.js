@@ -1,35 +1,41 @@
 import React, { useState } from "react";
 import genres from "./utils/genre.ts";
+import ai from "openai";
+
+const openai = new ai({
+	apiKey: process.env.REACT_APP_OPENAI_KEY,
+	dangerouslyAllowBrowser: true,
+});
 
 const App = () => {
-	const [genre, setGenre] = useState();
+	const [genre, setGenre] = useState("");
 
 	const createStory = async () => {
-		const req = await fetch("https://api.deepseek.com/chat/completions", {
-			method: "post",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${process.env.REACT_APP_DEEPSEEK_KEY}`,
-			},
-			body: JSON.stringify({
-				model: "deepseek-chat",
-				messages: [
-					{
-						role: "system",
-						content: "Jadilah kamu seorang penulis hebat",
-					},
-					{
-						role: "user",
-						content: `Buatkan saya sebuah cerita yang bergenre ${genre}. Berikan saya pilihan untuk menentukan kelanjutan alur ceritanya.`,
-					},
-				],
-				stream: false,
-			}),
+		const res = await openai.chat.completions.create({
+			model: "gpt-4o-mini",
+			messages: [
+				{
+					role: "developer",
+					content: [
+						{
+							type: "text",
+							text: "Kamu adalah seorang penulis cerita yang luar biasa, mampu menghidupkan imajinasi pembaca dengan alur yang mendalam dan karakter yang begitu nyata, seolah-olah setiap kata yang kamu tulis memiliki jiwa.",
+						},
+					],
+				},
+				{
+					role: "user",
+					content: [
+						{
+							type: "text",
+							text: `Buatkan sebuah cerita yang bergenre ${genre}, berikan saya beberapa pilihan untuk menentukan kelanjutan ceritanya. berikan pilihan dalam format JSON`,
+						},
+					],
+				},
+			],
+			store: true,
 		});
 
-		if (!req.ok) return;
-
-		const res = await req.json();
 		console.log(res);
 	};
 
