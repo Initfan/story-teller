@@ -9,7 +9,16 @@ const Story = () => {
 	const action = useLoaderData();
 	const { data }: { data: storyInterface } = action;
 
-	const storyAddHandler = () => {};
+	const storyAddHandler = async (option: string) => {
+		const req = await fetch("http://localhost:8000/story/continue", {
+			credentials: "include",
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ option }),
+		});
+		const res = await req.json();
+		console.log(res);
+	};
 
 	return (
 		<Wrapper centered={false} className="overflow-y-hidden py-4">
