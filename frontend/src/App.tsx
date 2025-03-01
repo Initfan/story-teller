@@ -1,14 +1,20 @@
 import { useState } from "react";
 import Story from "./story/StoryView";
 import StoryCreate from "./story/StoryCreate";
-import { story } from "./utils/definition";
+import StoryView from "./story/StoryView";
 
 const App = () => {
-	const [story, setStory] = useState<story>();
+	const [story, setStory] = useState();
 
-	const storyHandler = (text: story) => setStory(text);
+	const storyHandler = (data: any) => {
+		setStory(data);
+	};
 
-	return story ? <Story {...story} /> : <StoryCreate story={storyHandler} />;
+	return story ? (
+		<StoryView props={story} />
+	) : (
+		<StoryCreate story={storyHandler} />
+	);
 };
 
 export default App;

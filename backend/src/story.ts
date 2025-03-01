@@ -8,15 +8,24 @@ app.post("/generate", async (c) => {
 
 	if (!req.genre) return c.json("No genre provided");
 
+	return c.json(req);
+
 	const chatSession = model.startChat({
 		generationConfig,
 	});
 
-	let result = await chatSession.sendMessage(
-		`buatkan cerita beserta judulnya yang bergenre ${req.genre}. berikan saya beberapa pilihan untuk melanjutkan kelanjutan ceritanya`
-	);
+	let prompt = `buatkan cerita beserta judulnya yang bergenre ${req.genre} `;
+	if (req.option) {
+		prompt += `.berikan saya beberapa pilihan untuk melanjutkan kelanjutan ceritanya`;
+	}
 
-	return c.json(result.response.text());
+	let result = await chatSession.sendMessage(prompt);
+
+	return c.json({
+		success: true,
+		data: result.response.text(),
+		messsage: "Story created",
+	});
 });
 
 export default app;
