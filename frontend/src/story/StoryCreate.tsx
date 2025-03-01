@@ -1,7 +1,7 @@
-import { ChangeEvent, useState, useTransition } from "react";
-import { genres, story } from "../utils/definition";
+import { ChangeEvent, useState } from "react";
+import { genres } from "../utils/definition";
 
-const StoryCreate = ({ story }: { story: (text: story) => void }) => {
+const StoryCreate = ({ story }: { story: (text: any) => void }) => {
 	const [genre, setGenre] = useState<string[]>([]);
 	const [loading, setLoading] = useState(false);
 
@@ -28,7 +28,7 @@ const StoryCreate = ({ story }: { story: (text: story) => void }) => {
 	};
 
 	return (
-		<div>
+		<form>
 			<h1>Story Teller</h1>
 			<h3>Pilih genre ceritamu</h3>
 			{genres.map((v, i) => (
@@ -46,14 +46,24 @@ const StoryCreate = ({ story }: { story: (text: story) => void }) => {
 					<br />
 				</>
 			))}
-			<br />
+			<div>
+				<label>menentukan kelanjutan cerita</label>
+				<input type="radio" name="option" value={"ya"} /> ya
+				<input
+					type="radio"
+					name="option"
+					value={"tidak"}
+					defaultChecked
+				/>
+				tidak
+			</div>
 			<button
 				onClick={createStory}
 				disabled={genre.length === 0 || loading}
 			>
 				Buat cerita
 			</button>
-		</div>
+		</form>
 	);
 };
 

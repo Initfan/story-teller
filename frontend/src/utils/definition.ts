@@ -6,9 +6,9 @@ export const genres: string[] = [
 	"dunia lain",
 ];
 
-export interface story {
-	genre: string[];
-	title: string;
-	sinopsis: string;
-	content: string;
-}
+// export interface story {
+// 	genre: string[];
+// 	title: string;
+// 	sinopsis: string;
+// 	content: string;
+// }
