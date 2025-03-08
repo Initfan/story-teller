@@ -8,8 +8,6 @@ app.post("/generate", async (c) => {
 
 	if (!req.genre) return c.json("No genre provided");
 
-	return c.json(req);
-
 	const chatSession = model.startChat({
 		generationConfig,
 	});
