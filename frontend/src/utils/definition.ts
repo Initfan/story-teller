@@ -6,9 +6,12 @@ export const genres: string[] = [
 	"dunia lain",
 ];
 
-// export interface story {
-// 	genre: string[];
-// 	title: string;
-// 	sinopsis: string;
-// 	content: string;
-// }
+export type storyType = {
+	judul: string;
+	cerita: string;
+	genre: string[];
+	pilihan_kelanjutan: {
+		id: number;
+		deskripsi: string;
+	}[];
+};
