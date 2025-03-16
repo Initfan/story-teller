@@ -21,17 +21,6 @@ const StoryCreate = () => {
 					<br />
 				</>
 			))}
-			<div>
-				<label>Pilih kelanjutan cerita</label>
-				<input type="radio" name="option" value="true" /> ya
-				<input
-					type="radio"
-					name="option"
-					value="false"
-					defaultChecked
-				/>
-				tidak
-			</div>
 			<button type="submit" disabled={pending}>
 				Buat cerita
 			</button>
