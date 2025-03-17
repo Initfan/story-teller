@@ -1,19 +1,65 @@
+import { useEffect, useState } from "react";
 import { storyType } from "../utils/definition";
+import StoryOption from "./StoryOption";
 
 const StoryView = ({ judul, cerita, pilihan_kelanjutan, genre }: storyType) => {
+	const [story, setStory] = useState<storyType>();
+	const [storyList, setStoryList] = useState<string[]>();
+
+	useEffect(() => {
+		setStoryList([cerita]);
+	}, [cerita]);
+
+	const generateNewStory = async (option: string) => {
+		try {
+			const req = await fetch("http://localhost:8000/story/continue", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					option,
+				}),
+			});
+
+			const res = await req.json();
+			const data: storyType = JSON.parse(res.data);
+
+			setStory(data);
+			setStoryList((p) => [...p!, data.cerita]);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return (
 		<>
-			<h1>{judul}</h1>
+			<h1>{judul || story?.judul}</h1>
 			<small>Genre {genre.map((v) => `${v} `)}</small>
-			<p>{cerita}</p>
-			<div>
-				{pilihan_kelanjutan.map((v: any, i: number) => (
-					<>
-						<p>{v.deskripsi}</p>
-						<button key={v.id}>{v.id}</button>
-					</>
-				))}
-			</div>
+			{storyList?.map((v) => (
+				<p>{v}</p>
+			))}
+			{story?.pilihan_kelanjutan
+				? story.pilihan_kelanjutan.map(
+						(v: { id: number; deskripsi: string }) => (
+							<StoryOption
+								key={v.id}
+								description={v.deskripsi}
+								id={v.id}
+								selectedOption={generateNewStory}
+							/>
+						)
+				  )
+				: pilihan_kelanjutan.map(
+						(v: { id: number; deskripsi: string }) => (
+							<StoryOption
+								key={v.id}
+								description={v.deskripsi}
+								id={v.id}
+								selectedOption={generateNewStory}
+							/>
+						)
+				  )}
 		</>
 	);
 };
