@@ -14,13 +14,12 @@ const App = () => {
 			},
 			body: JSON.stringify({
 				genre: formData.getAll("genre"),
-				option: formData.get("option"),
 			}),
 		});
 
 		const res = await req.json();
 
-		setStory(JSON.parse(res.data));
+		setStory(res.data);
 	};
 
 	return story ? (

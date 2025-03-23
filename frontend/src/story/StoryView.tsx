@@ -23,10 +23,9 @@ const StoryView = ({ judul, cerita, pilihan_kelanjutan, genre }: storyType) => {
 			});
 
 			const res = await req.json();
-			const data: storyType = JSON.parse(res.data);
 
-			setStory(data);
-			setStoryList((p) => [...p!, data.cerita]);
+			setStory(res.data);
+			setStoryList((p) => [...p!, res.data.cerita]);
 		} catch (error) {
 			console.log(error);
 		}
