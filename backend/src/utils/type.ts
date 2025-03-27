@@ -1,4 +1,4 @@
-export type storyType = {
+export interface storyType {
 	judul: string;
 	cerita: string;
 	genre: string[];
@@ -6,4 +6,12 @@ export type storyType = {
 		id: number;
 		deskripsi: string;
 	}[];
-};
+}
+
+export interface userType {
+	id: number;
+	name: string;
+	email: string;
+	password: string;
+	token: string | null;
+}
