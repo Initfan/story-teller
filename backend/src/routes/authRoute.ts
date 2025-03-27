@@ -11,6 +11,41 @@ type Variables = {
 const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
+app.post("/register", async (c) => {
+	try {
+		const validation = z
+			.object({
+				email: z.string().email(),
+				password: z.string().min(6),
+				name: z.string().min(1),
+			})
+			.safeParse(await c.req.json());
+
+		if (!validation.success) {
+			return c.json({ error: validation.error.errors }, 400);
+		}
+
+		const { email, password, name } = validation.data;
+
+		const hashedPassword = await bcrypt.hash(password, 10);
+		const user = await prisma.user.create({
+			data: {
+				name,
+				email,
+				password: hashedPassword,
+			},
+		});
+		return c.json({ user });
+	} catch (error) {
+		return c.json(
+			{
+				message: "Server error, try again later.",
+			},
+			400
+		);
+	}
+});
+
 app.post("/login", async (c) => {
 	try {
 		const validation = z
