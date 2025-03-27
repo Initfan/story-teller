@@ -11,6 +11,11 @@ type Variables = {
 const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
+app.post("logout", (c) => {
+	deleteCookie(c, "token");
+	return c.json("user logout success");
+});
+
 app.post("/register", async (c) => {
 	try {
 		const validation = z
