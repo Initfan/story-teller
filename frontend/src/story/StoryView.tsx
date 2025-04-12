@@ -23,10 +23,16 @@ const StoryView = ({ judul, cerita, pilihan_kelanjutan, genre }: storyType) => {
 			});
 
 			const res = await req.json();
+<<<<<<< HEAD
 			const data: storyType = JSON.parse(res.data);
 
 			setStory(data);
 			setStoryList((p) => [...p!, data.cerita]);
+=======
+
+			setStory(res.data);
+			setStoryList((p) => [...p!, res.data.cerita]);
+>>>>>>> 0451b12d61cce57b98068bc7b34df2cfb388917c
 		} catch (error) {
 			console.log(error);
 		}
