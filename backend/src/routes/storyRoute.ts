@@ -16,21 +16,56 @@ const chatSession = model.startChat({
 	generationConfig,
 });
 
-app.on(["post", "get"], ["generate", "continue", ""], async (c, next) => {
-	const token = getCookie(c, "token");
-	if (!token) return c.body("unauthorize", 401);
-	const user = await prisma.user.findFirst({
-		where: { token },
+app.on(
+	["post", "get"],
+	["generate", "continue", "", "/:id"],
+	async (c, next) => {
+		const token = getCookie(c, "token");
+		if (!token) return c.body("unauthorize", 400);
+		const user = await prisma.user.findFirst({
+			where: { token },
+		});
+		c.set("user", user as userType);
+		await next();
+	}
+);
+
+app.get("/:id", async (c) => {
+	const req = c.req.param("id");
+	const user = c.get("user") as userType;
+	if (!user) return c.body("unauthorize", 401);
+
+	const story = await prisma.story.findFirst({
+		where: { id: Number(req), user_id: user.id },
 	});
-	c.set("user", user as userType);
-	await next();
+
+	if (!story) return c.body("story not found", 404);
+
+	const storyDetail = await prisma.story_detail.findFirst({
+		where: { story_id: story.id },
+	});
+
+	if (!storyDetail) return c.body("story detail not found", 404);
+
+	return c.json({
+		success: true,
+		data: {
+			...story,
+			story_detail: storyDetail.story,
+		},
+	});
 });
 
-app.get("/", async (c) => {
+app.get("", async (c) => {
 	const user = c.get("user") as userType;
+	console.log("unathorize");
+	if (!user) return c.body("unauthorize", 401);
 
 	const stories = await prisma.story.findMany({
 		where: { user_id: user.id },
+		// include: {
+		// 	story_detail: true,
+		// },
 	});
 
 	return c.json({
@@ -95,7 +130,6 @@ app.post("/continue", async (c) => {
 	if (!validation.success) return c.json(validation.error);
 
 	try {
-		chatSession.getHistory();
 		const newStory = await chatSession.sendMessage(validation.data.option);
 		return c.json({
 			success: true,
