@@ -8,6 +8,7 @@ import {
 } from "../utils/gemini.js";
 import type { storyType, userType } from "../utils/type.js";
 import { getCookie } from "hono/cookie";
+import { HTTPException } from "hono/http-exception";
 
 type Variables = {
 	user: userType;
@@ -48,25 +49,40 @@ app.on(
 	["generate", "continue", "/", "/:id"],
 	async (c, next) => {
 		const token = getCookie(c, "token");
-		if (!token) return c.body("unauthorize", 400);
-		const user = await prisma.user.findFirst({
-			where: { token },
-		});
-		c.set("user", user as userType);
-		await next();
+		if (!token) throw new HTTPException(401, { message: "unauthorize" });
+		try {
+			const user = await prisma.user.findFirst({
+				where: { token },
+			});
+			c.set("user", user as userType);
+			await next();
+		} catch (error) {
+			console.log(error);
+		}
 	}
 );
 
-app.get("/:id", async (c) => {
-	const req = c.req.param("id");
-	const user = c.get("user") as userType;
-	if (!user) return c.body("unauthorize", 401);
+app.get("/genre", async (c) => {
+	const chat = geminiModel.startChat({ generationConfig });
+	const genre = await chat.sendMessage("Berikan 10 genre pada cerita");
+	return c.json({
+		success: true,
+		data: JSON.parse(genre.response.text()),
+		message: "all story genre",
+	});
+});
 
+app.get("/:id", async (c) => {
+	const id = z.number().safeParse(Number(c.req.param("id")));
+	if (id.error)
+		throw new HTTPException(403, { message: "ID should be number" });
+
+	const user = c.get("user") as userType;
 	const story = await prisma.story.findFirst({
-		where: { id: Number(req), user_id: user.id },
+		where: { id: id.data, user_id: user.id },
 	});
 
-	if (!story) return c.body("story not found", 404);
+	if (!story) throw new HTTPException(404, { message: "Story not found" });
 
 	const storyDetail = await prisma.story_detail.findFirst({
 		where: { story_id: story.id },
@@ -90,9 +106,6 @@ app.get("", async (c) => {
 
 	const stories = await prisma.story.findMany({
 		where: { user_id: user.id },
-		// include: {
-		// 	story_detail: true,
-		// },
 	});
 
 	return c.json({
