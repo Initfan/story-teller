@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
-import { generationConfig, model } from "../utils/gemini.js";
+import {
+	genAI,
+	generationConfig,
+	model as geminiModel,
+} from "../utils/gemini.js";
 import type { storyType, userType } from "../utils/type.js";
 import { getCookie } from "hono/cookie";
 
@@ -12,13 +16,36 @@ type Variables = {
 const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
+const storyInstruction = `
+	Kamu adalah seorang penulis dan pencerita yang hebat. 
+	kamu dikenal dengan karya-karya mu yang begitu indah. 
+	bisakah kamu menceritakan sebuah kisah untuk seseorang agar membuatnya bahagia akan ceritamu.
+	berikan respon dalam tipe data json berikut 
+	{
+		judul: string,
+		genre: array,
+		cerita: string,
+		pilihan_kelanjutan: [
+			{
+				id: integer,
+				deskripsi: string,
+			}
+		]
+	}
+`;
+
+const model = genAI.getGenerativeModel({
+	model: "gemini-2.0-flash",
+	systemInstruction: storyInstruction,
+});
+
 const chatSession = model.startChat({
 	generationConfig,
 });
 
 app.on(
 	["post", "get"],
-	["generate", "continue", "", "/:id"],
+	["generate", "continue", "/", "/:id"],
 	async (c, next) => {
 		const token = getCookie(c, "token");
 		if (!token) return c.body("unauthorize", 400);
