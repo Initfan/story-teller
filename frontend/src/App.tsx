@@ -1,9 +1,8 @@
-import { useState } from "react";
-import StoryCreate from "./story/StoryCreate";
-import { storyType } from "./utils/definition";
-import StoryView from "./story/StoryView";
+import { ModeToggle } from "./components/mode-toggle";
+import { ThemeProvider } from "./components/theme-provider";
 
 const App = () => {
+<<<<<<< HEAD
 	const [story, setStory] = useState<storyType>();
 
 	const createStory = async (formData: FormData) => {
@@ -36,6 +35,14 @@ const App = () => {
 		<form action={createStory}>
 			<StoryCreate />
 		</form>
+=======
+	return (
+		<ThemeProvider defaultTheme="dark" storageKey="theme">
+			<p>Mythica</p>
+			<ModeToggle />
+			{/* <p>hello world</p> */}
+		</ThemeProvider>
+>>>>>>> backend
 	);
 };
 
