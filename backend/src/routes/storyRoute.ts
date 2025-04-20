@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono, type Next } from "hono";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import {
@@ -44,23 +44,19 @@ const chatSession = model.startChat({
 	generationConfig,
 });
 
-app.on(
-	["post", "get"],
-	["generate", "continue", "/", "/:id"],
-	async (c, next) => {
-		const token = getCookie(c, "token");
-		if (!token) throw new HTTPException(401, { message: "unauthorize" });
-		try {
-			const user = await prisma.user.findFirst({
-				where: { token },
-			});
-			c.set("user", user as userType);
-			await next();
-		} catch (error) {
-			console.log(error);
-		}
+const authorize = async (c: any, next: Next) => {
+	const token = getCookie(c, "token");
+	if (!token) throw new HTTPException(401, { message: "unauthorize" });
+	try {
+		const user = await prisma.user.findFirst({
+			where: { token },
+		});
+		c.set("user", user as userType);
+		await next();
+	} catch (error) {
+		console.log(error);
 	}
-);
+};
 
 app.get("/genre", async (c) => {
 	const chat = geminiModel.startChat({ generationConfig });
@@ -69,6 +65,21 @@ app.get("/genre", async (c) => {
 		success: true,
 		data: JSON.parse(genre.response.text()),
 		message: "all story genre",
+	});
+});
+
+app.use(authorize);
+
+app.get("", async (c) => {
+	const user = c.get("user") as userType;
+
+	const stories = await prisma.story.findMany({
+		where: { user_id: user.id },
+	});
+
+	return c.json({
+		success: true,
+		data: stories,
 	});
 });
 
@@ -97,20 +108,21 @@ app.get("/:id", async (c) => {
 			story_detail: storyDetail.story,
 		},
 	});
-});
-
-app.get("", async (c) => {
+}).delete(async (c) => {
 	const user = c.get("user") as userType;
-	console.log("unathorize");
-	if (!user) return c.body("unauthorize", 401);
+	const id = z.number().safeParse(Number(c.req.param("id")));
+	if (id.error)
+		throw new HTTPException(403, {
+			message: id.error.flatten().formErrors.toString(),
+		});
 
-	const stories = await prisma.story.findMany({
-		where: { user_id: user.id },
+	await prisma.story.deleteMany({
+		where: { id: id.data, user_id: user.id },
 	});
 
 	return c.json({
 		success: true,
-		data: stories,
+		message: "Delete story success",
 	});
 });
 
