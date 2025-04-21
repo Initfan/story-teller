@@ -1,48 +1,23 @@
-import { ModeToggle } from "./components/mode-toggle";
+// import { useState } from "react";
 import { ThemeProvider } from "./components/theme-provider";
 
 const App = () => {
-<<<<<<< HEAD
-	const [story, setStory] = useState<storyType>();
+	// const [genre, setGenre] = useState<string[] | null>(
+	// 	JSON.parse(localStorage.getItem("genre")!)
+	// );
 
-	const createStory = async (formData: FormData) => {
-		const req = await fetch("http://localhost:8000/story/generate", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				genre: formData.getAll("genre"),
-<<<<<<< HEAD
-				option: formData.get("option"),
-=======
->>>>>>> 0451b12d61cce57b98068bc7b34df2cfb388917c
-			}),
-		});
-
-		const res = await req.json();
-
-<<<<<<< HEAD
-		setStory(JSON.parse(res.data));
-=======
-		setStory(res.data);
->>>>>>> 0451b12d61cce57b98068bc7b34df2cfb388917c
-	};
-
-	return story ? (
-		<StoryView {...story} />
-	) : (
-		<form action={createStory}>
-			<StoryCreate />
-		</form>
-=======
 	return (
-		<ThemeProvider defaultTheme="dark" storageKey="theme">
-			<p>Mythica</p>
-			<ModeToggle />
-			{/* <p>hello world</p> */}
+		<ThemeProvider defaultTheme="system" storageKey="theme">
+			<div className="flex justify-center items-center h-screen">
+				<div className="space-y-4 text-center">
+					<h1 className="text-5xl">Mythia</h1>
+					<p>
+						Unleash your creativity with AI-powered story
+						generation.
+					</p>
+				</div>
+			</div>
 		</ThemeProvider>
->>>>>>> backend
 	);
 };
 
