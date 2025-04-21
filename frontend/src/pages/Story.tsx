@@ -4,6 +4,8 @@ import { Separator } from "@/components/ui/separator";
 import Wrapper from "@/components/wrapper";
 
 const Story = () => {
+	const storyAddHandler = (option: number, story: string) => {};
+
 	return (
 		<Wrapper centered={false} className="overflow-y-hidden py-4">
 			<main className="my-2 md:my-4">
@@ -23,7 +25,10 @@ const Story = () => {
 							))}
 						</div>
 					</div>
-					<StoryAdd option={['mati', 'hidup', 'respawn']} />
+					<StoryAdd
+						option={["mati", "hidup", "respawn"]}
+						storyAddHandler={storyAddHandler}
+					/>
 				</div>
 			</main>
 			<StoryText stories={["1", "2"]} />

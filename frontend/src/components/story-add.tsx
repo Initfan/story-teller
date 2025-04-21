@@ -16,17 +16,15 @@ import { useRef, useState } from "react";
 
 type props = {
 	option: string[];
+	storyAddHandler: (option: number, story: string) => void;
 };
 
-const StoryAdd = ({ option }: props) => {
+const StoryAdd = ({ option, storyAddHandler }: props) => {
 	const inputRef = useRef<HTMLInputElement>(null);
-	const [checked, setChecked] = useState<string>();
+	const [checked, setChecked] = useState<number | null>();
 
-	const handleSubmit = async () => {
-		if (inputRef.current!.value != "") {
-			alert(`Cerita: ${inputRef.current!.value}`);
-		}
-	};
+	const handleSubmit = () =>
+		storyAddHandler(checked!, inputRef.current!.value);
 
 	return (
 		<Dialog>
@@ -47,13 +45,13 @@ const StoryAdd = ({ option }: props) => {
 						{option.map((v, i) => (
 							<div
 								className="flex items-center space-x-3"
-								onClick={() => setChecked(v)}
+								onClick={() => setChecked(i)}
 								key={i}
 							>
 								<RadioGroupItem
 									value={`${i}`}
 									id={`${i}`}
-									checked={checked === v}
+									checked={checked === i}
 								/>
 								<Label htmlFor={`${i}`}>{v} </Label>
 							</div>
@@ -61,7 +59,7 @@ const StoryAdd = ({ option }: props) => {
 					</RadioGroup>
 					<div
 						className="w-full max-w-sm grid gap-1.5 my-2"
-						onChange={() => setChecked("")}
+						onChange={() => setChecked(null)}
 					>
 						<Label htmlFor="picture">Cerita</Label>
 						<Input
