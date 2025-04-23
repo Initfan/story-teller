@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { MultiSelect } from "../components/multi-select";
-import { Link } from "react-router";
+import { Form, Link } from "react-router";
 import Wrapper from "@/components/wrapper";
 
 const App = () => {
@@ -23,27 +23,31 @@ const App = () => {
 
 	return (
 		<Wrapper>
-			<div className="flex justify-center items-center">
+			<Form
+				className="flex justify-center items-center"
+				action="/story"
+				method="post"
+			>
 				<div className="space-y-4 text-center">
 					<h1 className="text-5xl">Mythia</h1>
 					<p>
 						Unleash your creativity with AI-powered story
 						generation.
 					</p>
+					<input type="hidden" value={selectedGenre} name="genre" />
 					<MultiSelect
 						options={genre!.map((v) => ({
 							label: v,
 							value: v,
 						}))}
+						placeholder="Select genre"
 						onValueChange={setSelectedGenre}
 					/>
-					<Link to="/story">
-						<Button variant="outline" className="cursor-pointer">
-							Generate Story
-						</Button>
-					</Link>
+					<Button variant="outline" type="submit">
+						Generate Story
+					</Button>
 				</div>
-			</div>
+			</Form>
 		</Wrapper>
 	);
 };

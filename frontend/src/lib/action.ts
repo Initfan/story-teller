@@ -1,0 +1,21 @@
+type actionType = {
+	request: Request;
+};
+
+export const generateStory = async ({ request }: actionType) => {
+	const formData = await request.formData();
+	const genre = formData.getAll("genre");
+
+	try {
+		const res = await fetch("http://localhost:8000/story/generate", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(genre),
+		});
+
+		const data = await res.json();
+		return data;
+	} catch (error) {
+		console.error("Error:", error);
+	}
+};

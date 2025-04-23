@@ -2,6 +2,7 @@ import Layout from "@/Layout";
 import App from "@/pages/App";
 import Story from "@/pages/Story";
 import { createBrowserRouter } from "react-router";
+import { generateStory } from "./action";
 
 const router = createBrowserRouter([
 	{
@@ -15,6 +16,7 @@ const router = createBrowserRouter([
 			{
 				path: "/story",
 				Component: Story,
+				action: generateStory,
 			},
 		],
 	},
