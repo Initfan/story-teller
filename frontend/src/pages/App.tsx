@@ -28,7 +28,7 @@ const App = () => {
 				action="/story"
 				method="post"
 			>
-				<div className="space-y-4 text-center">
+				<div className="space-y-4 text-center flex flex-col items-center">
 					<h1 className="text-5xl">Mythia</h1>
 					<p>
 						Unleash your creativity with AI-powered story
@@ -46,6 +46,9 @@ const App = () => {
 					<Button variant="outline" type="submit">
 						Generate Story
 					</Button>
+					<Link to="/auth/login">
+						<Button variant="link">Sign In</Button>
+					</Link>
 				</div>
 			</Form>
 		</Wrapper>
