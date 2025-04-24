@@ -9,12 +9,9 @@ type props = {
 const StoryText = ({ stories, loading }: props) => {
 	return (
 		<ScrollArea className="h-1/3 flex-1 pr-4">
-			{stories.map((_, i) => (
+			{stories.map((v, i) => (
 				<p key={i} className="tracking-widest mb-1">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit.
-					Labore incidunt cumque quibusdam voluptates eaque nihil
-					consequatur nemo a, beatae delectus voluptatum accusamus
-					odio placeat minima doloribus at omnis eligendi dolor.
+					{v}
 				</p>
 			))}
 			{loading && (

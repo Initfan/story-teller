@@ -3,9 +3,9 @@ import App from "@/pages/App";
 import Story from "@/pages/Story";
 import { createBrowserRouter } from "react-router";
 import { generateStory } from "./action";
-import auth from "@/pages/signup";
 import login from "@/pages/signin";
 import signup from "@/pages/signup";
+import { appLoader } from "./loader";
 
 const router = createBrowserRouter([
 	{
@@ -14,6 +14,7 @@ const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
+				loader: appLoader,
 				Component: App,
 			},
 			{

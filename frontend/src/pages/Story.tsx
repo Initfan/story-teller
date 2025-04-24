@@ -2,22 +2,29 @@ import StoryAdd from "@/components/story-add";
 import StoryText from "@/components/story-text";
 import { Separator } from "@/components/ui/separator";
 import Wrapper from "@/components/wrapper";
-import { useActionData } from "react-router";
+import { storyInterface } from "@/lib/interface";
+import { useEffect } from "react";
+import { useActionData, useNavigate } from "react-router";
 
 const Story = () => {
-	const story = useActionData();
-	const storyAddHandler = (option: number, story: string) => {};
+	const action = useActionData();
+	const navigate = useNavigate();
+	const { data }: { data: storyInterface } = action;
+
+	useEffect(() => {
+		if (!action) navigate("/");
+	});
+
+	const storyAddHandler = () => {};
 
 	return (
 		<Wrapper centered={false} className="overflow-y-hidden py-4">
 			<main className="my-2 md:my-4">
 				<div className="flex justify-between items-center">
 					<div>
-						<h2 className="text-4xl font-bold">
-							Lorem ipsum dolor sit.
-						</h2>
+						<h2 className="text-4xl font-bold">{data.judul}</h2>
 						<div className="flex space-x-3 mt-3 h-4 items-center">
-							{["misteri", "mistis"].map((v) => (
+							{data.genre.map((v) => (
 								<div key={v}>
 									<div className="font-medium text-accent">
 										{v}
@@ -28,12 +35,12 @@ const Story = () => {
 						</div>
 					</div>
 					<StoryAdd
-						option={["mati", "hidup", "respawn"]}
+						option={data.pilihan_kelanjutan}
 						storyAddHandler={storyAddHandler}
 					/>
 				</div>
 			</main>
-			<StoryText stories={["1", "2"]} />
+			<StoryText stories={[data.cerita]} />
 		</Wrapper>
 	);
 };

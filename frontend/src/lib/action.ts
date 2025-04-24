@@ -9,8 +9,9 @@ export const generateStory = async ({ request }: actionType) => {
 	try {
 		const res = await fetch("http://localhost:8000/story/generate", {
 			method: "POST",
+			credentials: "include",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(genre),
+			body: JSON.stringify({ genre: genre }),
 		});
 
 		const data = await res.json();

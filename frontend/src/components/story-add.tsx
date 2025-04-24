@@ -15,7 +15,10 @@ import { Input } from "./ui/input";
 import { useRef, useState } from "react";
 
 type props = {
-	option: string[];
+	option: {
+		id: number;
+		deskripsi: string;
+	}[];
 	storyAddHandler: (option: number, story: string) => void;
 };
 
@@ -42,18 +45,18 @@ const StoryAdd = ({ option, storyAddHandler }: props) => {
 				</DialogHeader>
 				<main>
 					<RadioGroup>
-						{option.map((v, i) => (
+						{option.map((v) => (
 							<div
 								className="flex items-center space-x-3"
-								onClick={() => setChecked(i)}
-								key={i}
+								onClick={() => setChecked(v.id)}
+								key={v.id}
 							>
 								<RadioGroupItem
-									value={`${i}`}
-									id={`${i}`}
-									checked={checked === i}
+									value={`${v.id}`}
+									id={`${v.id}`}
+									checked={checked === v.id}
 								/>
-								<Label htmlFor={`${i}`}>{v} </Label>
+								<Label htmlFor={`${v.id}`}>{v.deskripsi}</Label>
 							</div>
 						))}
 					</RadioGroup>

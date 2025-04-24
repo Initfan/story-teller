@@ -1,25 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { MultiSelect } from "../components/multi-select";
-import { Form, Link } from "react-router";
+import { Form, Link, useLoaderData, useNavigation } from "react-router";
 import Wrapper from "@/components/wrapper";
+import { Loader2 } from "lucide-react";
 
 const App = () => {
 	const [selectedGenre, setSelectedGenre] = useState<string[]>([]);
-	const [genre, setGenre] = useState<string[] | null>(
-		JSON.parse(localStorage.getItem("genre")!)
-	);
-
-	useEffect(() => {
-		if (!genre) {
-			fetch("http://localhost:8000/story/genre")
-				.then((req) => req.json())
-				.then((res) => {
-					setGenre(res.data);
-					localStorage.setItem("genre", JSON.stringify(res.data));
-				});
-		}
-	}, [genre]);
+	const { genre }: { genre: string } = useLoaderData();
+	const navigation = useNavigation();
 
 	return (
 		<Wrapper>
@@ -36,17 +25,24 @@ const App = () => {
 					</p>
 					<input type="hidden" value={selectedGenre} name="genre" />
 					<MultiSelect
-						options={genre!.map((v) => ({
+						options={JSON.parse(genre).map((v: string) => ({
 							label: v,
 							value: v,
 						}))}
 						placeholder="Select genre"
 						onValueChange={setSelectedGenre}
 					/>
-					<Button variant="outline" type="submit">
+					<Button
+						variant="outline"
+						type="submit"
+						disabled={navigation.state !== "idle"}
+					>
+						{navigation.state !== "idle" && (
+							<Loader2 className="animate-spin" />
+						)}
 						Generate Story
 					</Button>
-					<Link to="/auth/login">
+					<Link to="/auth/signin">
 						<Button variant="link">Sign In</Button>
 					</Link>
 				</div>
