@@ -17,51 +17,67 @@ import { Link, useNavigate } from "react-router";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
+	name: z
+		.string()
+		.min(4, { message: "Username must be at least 4 characters" }),
 	email: z.string().email(),
 	password: z
 		.string()
 		.min(6, { message: "Password must be at least 8 characters" }),
-	remember: z.boolean().optional(),
 });
 
-const login = () => {
+const signup = () => {
 	const navigate = useNavigate();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
+			name: "",
 			email: "",
 			password: "",
 		},
 	});
 
 	const onSubmit = async (data: z.infer<typeof formSchema>) => {
-		const req = await fetch("http://localhost:8000/auth/login", {
+		const req = await fetch("http://localhost:8000/auth/register", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			credentials: "include",
 			body: JSON.stringify(data),
 		});
 
-		const res = await req.json();
-		if (res.token) {
-			return navigate("/");
+		if (req.ok) {
+			return navigate("/auth/signin");
 		}
 	};
 
 	return (
-		<main className="w-2/3 mx-auto flex h-screen items-center ">
+		<main className="w-2/3 mx-auto flex h-screen items-center justify-center">
 			<Card className="w-full max-w-sm ">
 				<CardContent>
-					<h1 className="text-2xl mb-4 text-center">
-						Sign In to <span className="font-bold">Mythia</span>
+					<h1 className="text-2xl text-center mb-4">
+						Sign Up to <span className="font-bold">Mythia</span>
 					</h1>
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
 							className="space-y-4"
 						>
+							<FormField
+								name="name"
+								control={form.control}
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel htmlFor="username">
+											Username
+										</FormLabel>
+										<FormControl>
+											<Input {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							></FormField>
 							<FormField
 								name="email"
 								control={form.control}
@@ -105,13 +121,13 @@ const login = () => {
 							</Button>
 						</form>
 						<div className="flex items-center">
-							Doesn't have account?
-							<Link to="/auth/signup">
+							Already have account?
+							<Link to="/auth/signin">
 								<Button
 									variant="link"
 									className="mx-0 px-1 text-blue-500"
 								>
-									Sign Up
+									Sign In
 								</Button>
 							</Link>
 						</div>
@@ -122,4 +138,4 @@ const login = () => {
 	);
 };
 
-export default login;
+export default signup;
