@@ -51,8 +51,8 @@ const login = () => {
 	};
 
 	return (
-		<main className="w-2/3 mx-auto flex h-screen items-center ">
-			<Card className="w-full max-w-sm ">
+		<main className="w-2/3 mx-auto justify-center flex h-screen items-center ">
+			<Card className="w-full max-w-sm">
 				<CardContent>
 					<h1 className="text-2xl mb-4 text-center">
 						Sign In to <span className="font-bold">Mythia</span>
