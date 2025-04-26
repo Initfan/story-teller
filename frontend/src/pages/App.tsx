@@ -1,49 +1,52 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { MultiSelect } from "../components/multi-select";
-import { Link } from "react-router";
+import { Form, Link, useLoaderData, useNavigation } from "react-router";
 import Wrapper from "@/components/wrapper";
+import { Loader2 } from "lucide-react";
 
 const App = () => {
 	const [selectedGenre, setSelectedGenre] = useState<string[]>([]);
-	const [genre, setGenre] = useState<string[] | null>(
-		JSON.parse(localStorage.getItem("genre")!)
-	);
-
-	useEffect(() => {
-		if (!genre) {
-			fetch("http://localhost:8000/story/genre")
-				.then((req) => req.json())
-				.then((res) => {
-					setGenre(res.data);
-					localStorage.setItem("genre", JSON.stringify(res.data));
-				});
-		}
-	}, [genre]);
+	const { genre }: { genre: string } = useLoaderData();
+	const navigate = useNavigation();
 
 	return (
 		<Wrapper>
-			<div className="flex justify-center items-center">
-				<div className="space-y-4 text-center">
+			<Form
+				className="flex justify-center items-center"
+				method="post"
+				action="/"
+			>
+				<div className="space-y-4 text-center flex flex-col items-center">
 					<h1 className="text-5xl">Mythia</h1>
 					<p>
 						Unleash your creativity with AI-powered story
 						generation.
 					</p>
+					<input type="hidden" value={selectedGenre} name="genre" />
 					<MultiSelect
-						options={genre!.map((v) => ({
+						options={JSON.parse(genre).map((v: string) => ({
 							label: v,
 							value: v,
 						}))}
+						placeholder="Select genre"
 						onValueChange={setSelectedGenre}
 					/>
-					<Link to="/story">
-						<Button variant="outline" className="cursor-pointer">
-							Generate Story
-						</Button>
+					<Button
+						variant="outline"
+						type="submit"
+						disabled={navigate.state != "idle"}
+					>
+						{navigate.state != "idle" && (
+							<Loader2 className="animate-spin" />
+						)}
+						Generate Story
+					</Button>
+					<Link to="/auth/signin">
+						<Button variant="link">Sign In</Button>
 					</Link>
 				</div>
-			</div>
+			</Form>
 		</Wrapper>
 	);
 };

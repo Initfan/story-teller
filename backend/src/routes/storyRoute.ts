@@ -1,6 +1,6 @@
 import { Hono, type Next } from "hono";
 import { z } from "zod";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import {
 	genAI,
 	generationConfig,
@@ -23,13 +23,13 @@ const storyInstruction = `
 	bisakah kamu menceritakan sebuah kisah untuk seseorang agar membuatnya bahagia akan ceritamu.
 	berikan respon dalam tipe data json berikut 
 	{
-		judul: string,
+		title: string,
 		genre: array,
-		cerita: string,
-		pilihan_kelanjutan: [
+		story: string,
+		choose_option: [
 			{
 				id: integer,
-				deskripsi: string,
+				option: string,
 			}
 		]
 	}
@@ -51,7 +51,7 @@ const authorize = async (c: any, next: Next) => {
 		const user = await prisma.user.findFirst({
 			where: { token },
 		});
-		c.set("user", user as userType);
+		c.set("user", user);
 		await next();
 	} catch (error) {
 		console.log(error);
@@ -83,90 +83,56 @@ app.get("", async (c) => {
 	});
 });
 
-app.get("/:id", async (c) => {
-	const id = z.number().safeParse(Number(c.req.param("id")));
-	if (id.error)
-		throw new HTTPException(403, { message: "ID should be number" });
-
-	const user = c.get("user") as userType;
-	const story = await prisma.story.findFirst({
-		where: { id: id.data, user_id: user.id },
-	});
-
-	if (!story) throw new HTTPException(404, { message: "Story not found" });
-
-	const storyDetail = await prisma.story_detail.findFirst({
-		where: { story_id: story.id },
-	});
-
-	if (!storyDetail) return c.body("story detail not found", 404);
-
-	return c.json({
-		success: true,
-		data: {
-			...story,
-			story_detail: storyDetail.story,
-		},
-	});
-}).delete(async (c) => {
-	const user = c.get("user") as userType;
-	const id = z.number().safeParse(Number(c.req.param("id")));
-	if (id.error)
-		throw new HTTPException(403, {
-			message: id.error.flatten().formErrors.toString(),
-		});
-
-	await prisma.story.deleteMany({
-		where: { id: id.data, user_id: user.id },
-	});
-
-	return c.json({
-		success: true,
-		message: "Delete story success",
-	});
-});
-
 app.post("/generate", async (c) => {
 	const req = await c.req.json();
 
 	const validation = z.string().array().safeParse(req.genre);
 
-	if (!validation.success) return c.body("genre not valid");
+	if (!validation.success)
+		throw new HTTPException(403, {
+			message: "Genre is required",
+		});
 
 	const prompt = `buatkan cerita beserta judulnya yang bergenre ${req.genre}. berikan saya beberapa pilihan untuk melanjutkan kelanjutan ceritanya`;
 
 	try {
-		const user = c.get("user") as userType;
+		const user = c.get("user");
 		const result = await chatSession.sendMessage(prompt);
 		const data: storyType = JSON.parse(result.response.text());
 
-		const jsonOption = data.pilihan_kelanjutan.map((v) =>
-			JSON.stringify(v)
-		);
+		let option: { option: string }[] = [];
+		data.choose_option.map((v) => option.push({ option: v.option }));
+		let genre: { genre: string }[] = [];
+		data.genre.map((v) => genre.push({ genre: v }));
 
 		const story = await prisma.story.create({
 			data: {
-				title: data.judul,
-				genre: data.genre.toString(),
-				option: jsonOption.toString(),
 				user_id: user.id,
+				title: data.title,
+				auto_generated: true,
+				detail: {
+					create: {
+						story_text: data.story,
+					},
+				},
+				option: {
+					createMany: { data: option },
+				},
+				genre: {
+					createMany: { data: genre },
+				},
 			},
-		});
-
-		await prisma.story_detail.create({
-			data: {
-				story: data.cerita,
-				story_id: story.id,
-			},
+			include: { detail: true, option: true, genre: true },
 		});
 
 		return c.json({
 			success: true,
-			data,
+			data: story,
 			messsage: "Story created",
 		});
 	} catch (error) {
-		return c.json({ success: false, error });
+		console.log(error);
+		throw new HTTPException(500, error!);
 	}
 });
 
@@ -191,6 +157,41 @@ app.post("/continue", async (c) => {
 	} catch (error) {
 		return c.json({ success: false, error });
 	}
+});
+
+app.get("/:id", async (c) => {
+	const id = z.number().safeParse(Number(c.req.param("id")));
+	if (id.error)
+		throw new HTTPException(403, { message: "ID should be number" });
+
+	const user = c.get("user") as userType;
+	const story = await prisma.story.findFirst({
+		where: { id: id.data, user_id: user.id },
+		include: { detail: true, option: true, genre: true },
+	});
+
+	if (!story) throw new HTTPException(404, { message: "Story not found" });
+
+	return c.json({
+		success: true,
+		data: story,
+	});
+}).delete(async (c) => {
+	const user = c.get("user") as userType;
+	const id = z.number().safeParse(Number(c.req.param("id")));
+	if (id.error)
+		throw new HTTPException(403, {
+			message: id.error.flatten().formErrors.toString(),
+		});
+
+	await prisma.story.deleteMany({
+		where: { id: id.data, user_id: user.id },
+	});
+
+	return c.json({
+		success: true,
+		message: "Delete story success",
+	});
 });
 
 export default app;

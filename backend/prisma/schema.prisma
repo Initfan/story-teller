@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -13,20 +14,39 @@ model user {
   email    String  @unique(map: "email") @db.VarChar(30)
   password String  @db.VarChar(255)
   token    String? @db.Text
+  story    story[]
 }
 
 model story {
-  id        Int     @id @default(autoincrement())
-  user_id   Int
-  title     String  @db.VarChar(255)
-  genre     String  @db.VarChar(100)
-  option    String  @db.LongText
-  is_finish Boolean @default(false)
+  id             Int            @id @default(autoincrement())
+  user           user           @relation(fields: [user_id], references: [id])
+  user_id        Int
+  detail         story_detail[]
+  genre          story_genre[]
+  option         story_option[]
+  title          String         @db.VarChar(255)
+  is_finish      Boolean        @default(false)
+  auto_generated Boolean        @default(false)
 }
 
 model story_detail {
   id             Int     @id @default(autoincrement())
+  story          story   @relation(fields: [story_id], references: [id])
   story_id       Int
-  story          String  @db.Text
+  story_text     String  @db.Text
   choosen_option String? @db.Text
+}
+
+model story_genre {
+  id       Int    @id @default(autoincrement())
+  story    story  @relation(fields: [story_id], references: [id])
+  story_id Int
+  genre    String @db.VarChar(50)
+}
+
+model story_option {
+  id       Int    @id @default(autoincrement())
+  story_id Int
+  story    story  @relation(fields: [story_id], references: [id])
+  option   String @db.Text
 }

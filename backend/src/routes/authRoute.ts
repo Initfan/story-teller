@@ -96,9 +96,8 @@ app.post("/login", async (c) => {
 
 			setCookie(c, "token", token, {
 				httpOnly: true,
-				// secure: true,
+				secure: true,
 				maxAge: 3600,
-				sameSite: "Strict",
 			});
 
 			return c.json({ message: "Login success", token: token });
