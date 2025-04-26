@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -20,9 +21,9 @@ model story {
   id             Int            @id @default(autoincrement())
   user           user           @relation(fields: [user_id], references: [id])
   user_id        Int
-  story_detail   story_detail[]
+  detail         story_detail[]
   genre          story_genre[]
-  story_option   story_option[]
+  option         story_option[]
   title          String         @db.VarChar(255)
   is_finish      Boolean        @default(false)
   auto_generated Boolean        @default(false)
