@@ -4,8 +4,10 @@ type storyOption = {
 };
 
 export interface storyInterface {
-	judul: string;
-	genre: string[];
-	cerita: string;
-	pilihan_kelanjutan: storyOption[];
+	id: number;
+	title: string;
+	genre: string;
+	story_detail: string;
+	option: string;
+	is_finish: boolean;
 }

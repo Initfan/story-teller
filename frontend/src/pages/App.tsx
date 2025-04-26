@@ -8,14 +8,14 @@ import { Loader2 } from "lucide-react";
 const App = () => {
 	const [selectedGenre, setSelectedGenre] = useState<string[]>([]);
 	const { genre }: { genre: string } = useLoaderData();
-	const navigation = useNavigation();
+	const navigate = useNavigation();
 
 	return (
 		<Wrapper>
 			<Form
 				className="flex justify-center items-center"
-				action="/story"
 				method="post"
+				action="/"
 			>
 				<div className="space-y-4 text-center flex flex-col items-center">
 					<h1 className="text-5xl">Mythia</h1>
@@ -35,9 +35,9 @@ const App = () => {
 					<Button
 						variant="outline"
 						type="submit"
-						disabled={navigation.state !== "idle"}
+						disabled={navigate.state != "idle"}
 					>
-						{navigation.state !== "idle" && (
+						{navigate.state != "idle" && (
 							<Loader2 className="animate-spin" />
 						)}
 						Generate Story

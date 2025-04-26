@@ -1,3 +1,5 @@
+import { redirect } from "react-router";
+
 type actionType = {
 	request: Request;
 };
@@ -15,7 +17,7 @@ export const generateStory = async ({ request }: actionType) => {
 		});
 
 		const data = await res.json();
-		return data;
+		if (data) return redirect(`/story/${data.id}`);
 	} catch (error) {
 		console.error("Error:", error);
 	}

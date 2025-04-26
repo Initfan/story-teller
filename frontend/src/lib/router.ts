@@ -6,11 +6,13 @@ import { createBrowserRouter } from "react-router";
 import login from "@/pages/signin";
 import signup from "@/pages/signup";
 import { appLoader, storyLoader } from "./loader";
+import { generateStory } from "./action";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
 		Component: Layout,
+		action: generateStory,
 		children: [
 			{
 				index: true,
