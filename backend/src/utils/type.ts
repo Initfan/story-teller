@@ -1,12 +1,19 @@
-export interface storyType {
-	judul: string;
-	cerita: string;
+export type story = {
+	id: string;
+	title: string;
+	is_finish: boolean;
+	auto_generated: boolean;
+};
+
+export type storyType = {
+	title: string;
+	story: string;
 	genre: string[];
-	pilihan_kelanjutan: {
+	choose_option: {
 		id: number;
-		deskripsi: string;
+		option: string;
 	}[];
-}
+};
 
 export interface userType {
 	id: number;
