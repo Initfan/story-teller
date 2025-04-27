@@ -22,7 +22,7 @@ const Story = () => {
 		});
 		const res = await req.json();
 		console.log(res);
-		setStory((p) => [...p, ...res.detail]);
+		setStory((p) => [...p, { ...res.data.detail }]);
 		setLoading((p) => !p);
 	};
 
@@ -44,7 +44,7 @@ const Story = () => {
 						</div>
 					</div>
 					<StoryAdd
-						option={data.detail[0].option}
+						option={story[story.length - 1].option}
 						storyAddHandler={storyAddHandler}
 					/>
 				</div>
