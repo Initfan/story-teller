@@ -14,7 +14,7 @@ const Story = () => {
 			credentials: "include",
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ option }),
+			body: JSON.stringify({ option, storyId: data.id }),
 		});
 		const res = await req.json();
 		console.log(res);

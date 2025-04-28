@@ -137,25 +137,74 @@ app.post("/generate", async (c) => {
 });
 
 app.post("/continue", async (c) => {
+	const user = c.get("user") as userType;
 	const req = await c.req.json();
 
 	const validation = z
 		.object({
 			option: z.string(),
+			storyId: z.number(),
 		})
 		.safeParse(req);
 
-	if (!validation.success) return c.json(validation.error);
+	if (!validation.success)
+		throw new HTTPException(403, {
+			message: "Option and storyId is required",
+		});
 
 	try {
-		const newStory = await chatSession.sendMessage(validation.data.option);
+		const story = await prisma.story.findFirst({
+			where: { id: req.storyId, user_id: user.id },
+			include: {
+				detail: {
+					orderBy: { id: "desc" },
+					take: 1,
+				},
+			},
+		});
+
+		await prisma.story_detail.update({
+			where: { id: story!.detail[0]["id"] },
+			data: {
+				choosen_option: validation.data.option,
+			},
+		});
+
+		const prompt = `lanjutkan cerita ini ${
+			story!.detail[0]["story_text"]
+		} dengan pilihan ${req.option}`;
+
+		const continueStory = await chatSession.sendMessage(prompt);
+		const data: storyType = JSON.parse(continueStory.response.text())[0];
+
+		let option: { option: string; story_id: number }[] = [];
+		data.choose_option.map((v) =>
+			option.push({ option: v.option, story_id: req.storyId })
+		);
+
+		const storyOption = await prisma.story_option.createMany({
+			data: option,
+		});
+
+		const storyDetail = await prisma.story_detail.create({
+			data: {
+				story_id: req.storyId,
+				story_text: data.story,
+			},
+		});
+
 		return c.json({
 			success: true,
-			data: newStory.response.text(),
+			data: {
+				...story,
+				option: storyOption,
+				detail: storyDetail,
+			},
 			message: "Story created",
 		});
 	} catch (error) {
-		return c.json({ success: false, error });
+		console.log(error);
+		throw new HTTPException(500, error!);
 	}
 });
 
