@@ -13,12 +13,10 @@ import { Label } from "@radix-ui/react-label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Input } from "./ui/input";
 import { FormEvent, useRef, useState } from "react";
+import { option } from "@/lib/interface";
 
 type props = {
-	option: {
-		id: number;
-		deskripsi: string;
-	}[];
+	option: option[];
 	storyAddHandler: (option: number, story: string) => void;
 };
 
@@ -60,7 +58,7 @@ const StoryAdd = ({ option, storyAddHandler }: props) => {
 										checked={checked === v.id}
 									/>
 									<Label htmlFor={`${v.id}`}>
-										{v.deskripsi}
+										{v.option}
 									</Label>
 								</div>
 							))}
