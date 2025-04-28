@@ -11,7 +11,7 @@ const StoryText = ({ stories, loading }: props) => {
 	return (
 		<ScrollArea className="h-1/3 flex-1 pr-4">
 			{stories.map((v, i) => (
-				<p key={i} className="tracking-widest mb-1">
+				<p key={i} className="tracking-widest mb-2">
 					{v.story_text}
 				</p>
 			))}
