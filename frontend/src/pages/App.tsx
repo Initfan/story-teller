@@ -1,21 +1,43 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "../components/ui/button";
 import { MultiSelect } from "../components/multi-select";
-import { Form, Link, useLoaderData, useNavigation } from "react-router";
+import { Link, useLoaderData, useNavigate } from "react-router";
 import Wrapper from "@/components/wrapper";
 import { Loader2 } from "lucide-react";
 
 const App = () => {
-	const [selectedGenre, setSelectedGenre] = useState<string[]>([]);
+	const [selectedGenre, setSelectedGenre] = useState<string[]>();
 	const { genre }: { genre: string } = useLoaderData();
-	const navigate = useNavigation();
+	const [loading, setLoading] = useState(false);
+	const navigate = useNavigate();
+
+	const onSubmit = async (e: FormEvent) => {
+		e.preventDefault();
+		setLoading((p) => !p);
+		if (!selectedGenre) return setLoading((p) => !p);
+		try {
+			const req = await fetch("http://localhost:8000/story/generate", {
+				method: "POST",
+				credentials: "include",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ genre: selectedGenre }),
+			});
+
+			if (req.status === 401) return navigate("/auth/signin");
+
+			const res = await req.json();
+			return navigate(`/story/${res.data.id}`);
+		} catch (error) {
+			console.error("Error:", error);
+		}
+		setLoading((p) => !p);
+	};
 
 	return (
 		<Wrapper>
-			<Form
+			<form
+				onSubmit={onSubmit}
 				className="flex justify-center items-center"
-				method="post"
-				action="/"
 			>
 				<div className="space-y-4 text-center flex flex-col items-center">
 					<h1 className="text-5xl">Mythia</h1>
@@ -23,7 +45,6 @@ const App = () => {
 						Unleash your creativity with AI-powered story
 						generation.
 					</p>
-					<input type="hidden" value={selectedGenre} name="genre" />
 					<MultiSelect
 						options={JSON.parse(genre).map((v: string) => ({
 							label: v,
@@ -32,21 +53,15 @@ const App = () => {
 						placeholder="Select genre"
 						onValueChange={setSelectedGenre}
 					/>
-					<Button
-						variant="outline"
-						type="submit"
-						disabled={navigate.state != "idle"}
-					>
-						{navigate.state != "idle" && (
-							<Loader2 className="animate-spin" />
-						)}
+					<Button variant="outline" type="submit" disabled={loading}>
+						{loading && <Loader2 className="animate-spin" />}
 						Generate Story
 					</Button>
 					<Link to="/auth/signin">
 						<Button variant="link">Sign In</Button>
 					</Link>
 				</div>
-			</Form>
+			</form>
 		</Wrapper>
 	);
 };
