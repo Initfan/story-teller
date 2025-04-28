@@ -16,7 +16,7 @@ export const generateStory = async ({ request }: actionType) => {
 			body: JSON.stringify({ genre: genre }),
 		});
 
-		if (!res.ok) return redirect("/auth/signin");
+		if (res.status === 401) return redirect("/auth/signin");
 
 		const data = await res.json();
 		return redirect(`/story/${data.id}`);
