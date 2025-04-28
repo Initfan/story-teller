@@ -183,20 +183,20 @@ app.post("/continue", async (c) => {
 		const continueStory = await chatSession.sendMessage(prompt);
 		const data: storyType = JSON.parse(continueStory.response.text())[0];
 
-		let option: { option: string; detail_id: number }[] = [];
-		data.choose_option.map((v) =>
-			option.push({ option: v.option, detail_id: story!.detail[0]["id"] })
-		);
-
-		const storyOption = await prisma.story_option.createMany({
-			data: option,
-		});
-
 		const storyDetail = await prisma.story_detail.create({
 			data: {
 				story_id: req.storyId,
 				story_text: data.story,
 			},
+		});
+
+		let option: { option: string; detail_id: number }[] = [];
+		data.choose_option.map((v) =>
+			option.push({ option: v.option, detail_id: storyDetail.id })
+		);
+
+		const storyOption = await prisma.story_option.createMany({
+			data: option,
 		});
 
 		return c.json({
