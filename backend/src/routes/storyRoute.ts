@@ -1,4 +1,4 @@
-import { Hono, type Next } from "hono";
+import { Hono, type Context, type Next } from "hono";
 import { z } from "zod";
 import { Prisma, PrismaClient } from "@prisma/client";
 import {
@@ -44,18 +44,19 @@ const chatSession = model.startChat({
 	generationConfig,
 });
 
-const authorize = async (c: any, next: Next) => {
+const authorize = async (c: Context, next: Next) => {
 	const token = getCookie(c, "token");
 	if (!token) throw new HTTPException(401, { message: "unauthorize" });
 	try {
 		const user = await prisma.user.findFirst({
 			where: { token },
 		});
+		if (!user) return c.json({ message: "unauthorize" }, 401);
 		c.set("user", user);
-		await next();
 	} catch (error) {
 		console.log(error);
 	}
+	await next();
 };
 
 app.get("/genre", async (c) => {
@@ -98,7 +99,9 @@ app.post("/generate", async (c) => {
 	try {
 		const user = c.get("user");
 		const result = await chatSession.sendMessage(prompt);
-		const data: storyType = JSON.parse(result.response.text());
+		const data: storyType = JSON.parse(result.response.text())[0];
+
+		console.log(data.choose_option.toString());
 
 		let option: { option: string }[] = [];
 		data.choose_option.map((v) => option.push({ option: v.option }));
@@ -113,16 +116,16 @@ app.post("/generate", async (c) => {
 				detail: {
 					create: {
 						story_text: data.story,
+						option: {
+							createMany: { data: option },
+						},
 					},
-				},
-				option: {
-					createMany: { data: option },
 				},
 				genre: {
 					createMany: { data: genre },
 				},
 			},
-			include: { detail: true, option: true, genre: true },
+			include: { detail: { include: { option: true } }, genre: true },
 		});
 
 		return c.json({
@@ -163,6 +166,9 @@ app.post("/continue", async (c) => {
 			},
 		});
 
+		if (!story)
+			throw new HTTPException(404, { message: "Story not found" });
+
 		await prisma.story_detail.update({
 			where: { id: story!.detail[0]["id"] },
 			data: {
@@ -177,9 +183,9 @@ app.post("/continue", async (c) => {
 		const continueStory = await chatSession.sendMessage(prompt);
 		const data: storyType = JSON.parse(continueStory.response.text())[0];
 
-		let option: { option: string; story_id: number }[] = [];
+		let option: { option: string; detail_id: number }[] = [];
 		data.choose_option.map((v) =>
-			option.push({ option: v.option, story_id: req.storyId })
+			option.push({ option: v.option, detail_id: story!.detail[0]["id"] })
 		);
 
 		const storyOption = await prisma.story_option.createMany({
@@ -216,7 +222,7 @@ app.get("/:id", async (c) => {
 	const user = c.get("user") as userType;
 	const story = await prisma.story.findFirst({
 		where: { id: id.data, user_id: user.id },
-		include: { detail: true, option: true, genre: true },
+		include: { detail: { include: { option: true } }, genre: true },
 	});
 
 	if (!story) throw new HTTPException(404, { message: "Story not found" });
