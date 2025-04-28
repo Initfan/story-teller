@@ -7,6 +7,7 @@ export type detail = {
 	id: number;
 	story_text: string;
 	choosen_option?: string;
+	option: option[];
 };
 
 type genre = {
@@ -21,6 +22,5 @@ export interface storyInterface {
 	is_finish: boolean;
 	auto_generate: boolean;
 	detail: detail[];
-	option: option[];
 	genre: genre[];
 }

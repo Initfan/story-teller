@@ -38,7 +38,7 @@ const Story = () => {
 						</div>
 					</div>
 					<StoryAdd
-						option={data.option}
+						option={data.detail[0].option}
 						storyAddHandler={storyAddHandler}
 					/>
 				</div>
