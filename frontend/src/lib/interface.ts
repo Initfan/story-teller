@@ -1,13 +1,26 @@
-type storyOption = {
+export type option = {
 	id: number;
-	deskripsi: string;
+	option: string;
+};
+
+export type detail = {
+	id: number;
+	story_text: string;
+	choosen_option?: string;
+	option: option[];
+};
+
+type genre = {
+	id: number;
+	genre: string;
 };
 
 export interface storyInterface {
 	id: number;
+	user_id: number;
 	title: string;
-	genre: string;
-	story_detail: string;
-	option: string;
 	is_finish: boolean;
+	auto_generate: boolean;
+	detail: detail[];
+	genre: genre[];
 }

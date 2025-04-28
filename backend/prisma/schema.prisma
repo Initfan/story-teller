@@ -21,20 +21,20 @@ model story {
   id             Int            @id @default(autoincrement())
   user           user           @relation(fields: [user_id], references: [id])
   user_id        Int
+  title          String         @db.VarChar(255)
   detail         story_detail[]
   genre          story_genre[]
-  option         story_option[]
-  title          String         @db.VarChar(255)
   is_finish      Boolean        @default(false)
   auto_generated Boolean        @default(false)
 }
 
 model story_detail {
-  id             Int     @id @default(autoincrement())
-  story          story   @relation(fields: [story_id], references: [id])
+  id             Int            @id @default(autoincrement())
+  story          story          @relation(fields: [story_id], references: [id])
   story_id       Int
-  story_text     String  @db.Text
-  choosen_option String? @db.Text
+  story_text     String         @db.Text
+  option         story_option[]
+  choosen_option String?        @db.Text
 }
 
 model story_genre {
@@ -45,8 +45,8 @@ model story_genre {
 }
 
 model story_option {
-  id       Int    @id @default(autoincrement())
-  story_id Int
-  story    story  @relation(fields: [story_id], references: [id])
-  option   String @db.Text
+  id           Int          @id @default(autoincrement())
+  detail_id    Int
+  story_detail story_detail @relation(fields: [detail_id], references: [id])
+  option       String       @db.Text
 }

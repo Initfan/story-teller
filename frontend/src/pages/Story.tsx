@@ -3,31 +3,34 @@ import StoryText from "@/components/story-text";
 import { Separator } from "@/components/ui/separator";
 import Wrapper from "@/components/wrapper";
 import { storyInterface } from "@/lib/interface";
-import { useEffect } from "react";
-import { useActionData, useNavigate } from "react-router";
+import { useLoaderData } from "react-router";
 
 const Story = () => {
-	const action = useActionData();
-	const navigate = useNavigate();
+	const action = useLoaderData();
 	const { data }: { data: storyInterface } = action;
 
-	useEffect(() => {
-		if (!action) navigate("/");
-	});
-
-	const storyAddHandler = () => {};
+	const storyAddHandler = async (option: string) => {
+		const req = await fetch("http://localhost:8000/story/continue", {
+			credentials: "include",
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ option, storyId: data.id }),
+		});
+		const res = await req.json();
+		console.log(res);
+	};
 
 	return (
 		<Wrapper centered={false} className="overflow-y-hidden py-4">
 			<main className="my-2 md:my-4">
 				<div className="flex justify-between items-center">
 					<div>
-						<h2 className="text-4xl font-bold">{data.judul}</h2>
+						<h2 className="text-4xl font-bold">{data.title}</h2>
 						<div className="flex space-x-3 mt-3 h-4 items-center">
 							{data.genre.map((v) => (
-								<div key={v}>
+								<div key={v.id}>
 									<div className="font-medium text-accent">
-										{v}
+										{v.genre}
 									</div>
 									<Separator orientation="vertical" />
 								</div>
@@ -35,12 +38,12 @@ const Story = () => {
 						</div>
 					</div>
 					<StoryAdd
-						option={data.pilihan_kelanjutan}
+						option={data.detail[0].option}
 						storyAddHandler={storyAddHandler}
 					/>
 				</div>
 			</main>
-			<StoryText stories={[data.cerita]} />
+			<StoryText stories={data.detail} />
 		</Wrapper>
 	);
 };

@@ -12,33 +12,29 @@ import { Button } from "./ui/button";
 import { Label } from "@radix-ui/react-label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Input } from "./ui/input";
-import { FormEvent, useRef, useState } from "react";
+import { useState } from "react";
+import { option } from "@/lib/interface";
+import { Form } from "react-router";
 
 type props = {
-	option: {
-		id: number;
-		deskripsi: string;
-	}[];
-	storyAddHandler: (option: number, story: string) => void;
+	option: option[];
+	storyAddHandler: (option: string) => void;
 };
 
 const StoryAdd = ({ option, storyAddHandler }: props) => {
-	const inputRef = useRef<HTMLInputElement>(null);
 	const [checked, setChecked] = useState<number | null>();
+	const [selectedOption, setSelectedOption] = useState<string>();
 
-	const handleSubmit = (e: FormEvent) => {
-		e.preventDefault();
-		storyAddHandler(checked!, inputRef.current!.value);
-	};
+	const handleSubmit = () => storyAddHandler(selectedOption!);
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<Dialog>
-				<DialogTrigger asChild>
-					<Button variant="outline" className="cursor-pointer">
-						Tambah
-					</Button>
-				</DialogTrigger>
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button variant="outline" className="cursor-pointer">
+					Tambah
+				</Button>
+			</DialogTrigger>
+			<Form method="post" action="/">
 				<DialogContent className="sm:max-w-[425px]">
 					<DialogHeader>
 						<DialogTitle>Kelanjutan cerita</DialogTitle>
@@ -51,7 +47,10 @@ const StoryAdd = ({ option, storyAddHandler }: props) => {
 							{option.map((v) => (
 								<div
 									className="flex items-center space-x-3"
-									onClick={() => setChecked(v.id)}
+									onClick={() => {
+										setChecked(v.id);
+										setSelectedOption(v.option);
+									}}
 									key={v.id}
 								>
 									<RadioGroupItem
@@ -60,7 +59,7 @@ const StoryAdd = ({ option, storyAddHandler }: props) => {
 										checked={checked === v.id}
 									/>
 									<Label htmlFor={`${v.id}`}>
-										{v.deskripsi}
+										{v.option}
 									</Label>
 								</div>
 							))}
@@ -73,18 +72,20 @@ const StoryAdd = ({ option, storyAddHandler }: props) => {
 							<Input
 								id="story"
 								placeholder="Masukan ceritamu"
-								ref={inputRef}
+								onChange={(e) =>
+									setSelectedOption(e.target.value)
+								}
 							/>
 						</div>
 					</main>
 					<DialogFooter>
 						<DialogClose asChild>
-							<Button type="submit">Simpan</Button>
+							<Button onClick={handleSubmit}>Simpan</Button>
 						</DialogClose>
 					</DialogFooter>
 				</DialogContent>
-			</Dialog>
-		</form>
+			</Form>
+		</Dialog>
 	);
 };
 
