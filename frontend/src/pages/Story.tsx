@@ -2,14 +2,18 @@ import StoryAdd from "@/components/story-add";
 import StoryText from "@/components/story-text";
 import { Separator } from "@/components/ui/separator";
 import Wrapper from "@/components/wrapper";
-import { storyInterface } from "@/lib/interface";
+import { detail, storyInterface } from "@/lib/interface";
+import { useState } from "react";
 import { useLoaderData } from "react-router";
 
 const Story = () => {
 	const action = useLoaderData();
 	const { data }: { data: storyInterface } = action;
+	const [story, setStory] = useState<detail[]>(data.detail);
+	const [loading, setLoading] = useState(false);
 
 	const storyAddHandler = async (option: string) => {
+		setLoading((p) => !p);
 		const req = await fetch("http://localhost:8000/story/continue", {
 			credentials: "include",
 			method: "POST",
@@ -18,6 +22,8 @@ const Story = () => {
 		});
 		const res = await req.json();
 		console.log(res);
+		setStory((p) => [...p, ...res.detail]);
+		setLoading((p) => !p);
 	};
 
 	return (
@@ -43,7 +49,7 @@ const Story = () => {
 					/>
 				</div>
 			</main>
-			<StoryText stories={data.detail} />
+			<StoryText stories={story} loading={loading} />
 		</Wrapper>
 	);
 };
