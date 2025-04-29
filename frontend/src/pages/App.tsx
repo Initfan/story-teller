@@ -11,7 +11,6 @@ const App = () => {
 	const [selectedGenre, setSelectedGenre] = useState<string[]>();
 	const { genre }: { genre: string } = useLoaderData();
 	const [cookies] = useCookies(["user"]);
-	console.log(cookies);
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 
@@ -57,14 +56,28 @@ const App = () => {
 						placeholder="Select genre"
 						onValueChange={setSelectedGenre}
 					/>
-					<Button variant="outline" type="submit" disabled={loading}>
-						{loading && <Loader2 className="animate-spin" />}
-						Generate Story
-					</Button>
-					<Link to="/auth/signin">
-						<Button variant="link">Sign In</Button>
-					</Link>
-					<SignOut />
+					{cookies.user ? (
+						<>
+							<Button
+								variant="outline"
+								type="submit"
+								disabled={loading}
+							>
+								{loading && (
+									<Loader2 className="animate-spin" />
+								)}
+								Generate Story
+							</Button>
+							<SignOut />
+						</>
+					) : (
+						<>
+							<h3>You need to Login</h3>
+							<Link to="/auth/signin">
+								<Button variant="link">Sign In</Button>
+							</Link>
+						</>
+					)}
 				</div>
 			</form>
 		</Wrapper>
