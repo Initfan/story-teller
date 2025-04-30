@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router";
 import { Loader2 } from "lucide-react";
+import { useCookies } from "react-cookie";
 
 const formSchema = z.object({
 	email: z.string().email(),
@@ -25,6 +26,7 @@ const formSchema = z.object({
 });
 
 const login = () => {
+	const [, setCoookie] = useCookies(["user"]);
 	const navigate = useNavigate();
 	const form = useForm({
 		resolver: zodResolver(formSchema),
@@ -35,18 +37,21 @@ const login = () => {
 	});
 
 	const onSubmit = async (data: z.infer<typeof formSchema>) => {
-		const req = await fetch("http://localhost:8000/auth/login", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			credentials: "include",
-			body: JSON.stringify(data),
-		});
+		try {
+			const req = await fetch("http://localhost:8000/auth/login", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify(data),
+			});
 
-		const res = await req.json();
-		if (res.token) {
+			const res = await req.json();
+			setCoookie("user", res.user);
 			return navigate("/");
+		} catch (error) {
+			console.log(error);
 		}
 	};
 

@@ -100,7 +100,7 @@ app.post("/login", async (c) => {
 				maxAge: 3600,
 			});
 
-			return c.json({ message: "Login success", token: token });
+			return c.json({ message: "Login success", user, token: token });
 		} else {
 			return c.json({ error: "Invalid credentials" }, 401);
 		}

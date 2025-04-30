@@ -4,10 +4,14 @@ import { MultiSelect } from "../components/multi-select";
 import { Link, useLoaderData, useNavigate } from "react-router";
 import Wrapper from "@/components/wrapper";
 import { Loader2 } from "lucide-react";
+import { useCookies } from "react-cookie";
+import SignOut from "@/components/signout";
 
 const App = () => {
 	const [selectedGenre, setSelectedGenre] = useState<string[]>();
 	const { genre }: { genre: string } = useLoaderData();
+	const [cookies] = useCookies(["user"]);
+	console.log(cookies);
 	const [loading, setLoading] = useState(false);
 	const navigate = useNavigate();
 
@@ -60,6 +64,7 @@ const App = () => {
 					<Link to="/auth/signin">
 						<Button variant="link">Sign In</Button>
 					</Link>
+					<SignOut />
 				</div>
 			</form>
 		</Wrapper>
