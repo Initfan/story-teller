@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
 	Form,
 	FormControl,
@@ -15,7 +14,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router";
 import { Loader2 } from "lucide-react";
+import logo from "../assets/images/mythia-logo.png";
+import bg from "../assets/images/sci-fi.jpg";
 import { useCookies } from "react-cookie";
+import Wrapper from "@/components/wrapper";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
 	email: z.string().email(),
@@ -56,16 +60,24 @@ const login = () => {
 	};
 
 	return (
-		<main className="w-2/3 mx-auto justify-center flex h-screen items-center ">
-			<Card className="w-full max-w-sm">
-				<CardContent>
-					<h1 className="text-2xl mb-4 text-center">
-						Sign In to <span className="font-bold">Mythia</span>
+		<Wrapper Bg={false} className="w-full! grid grid-cols-2 h-screen">
+			<main className="p-8 relative">
+				<div className="flex items-center justify-between absolute inset-x-0 px-8">
+					<div className="flex items-center space-x-3">
+						<img src={logo} className="w-12" />
+						<h2 className="text-lg font-semibold">Mythia</h2>
+					</div>
+					<ModeToggle />
+				</div>
+				<div className="flex flex-col justify-center items-center space-y-8 h-full">
+					<h1 className="text-3xl">
+						Sign In to{" "}
+						<span className="font-semibold">Explore</span>
 					</h1>
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
-							className="space-y-4"
+							className="w-1/2 space-y-4"
 						>
 							<FormField
 								name="email"
@@ -76,7 +88,7 @@ const login = () => {
 											Email
 										</FormLabel>
 										<FormControl>
-											<Input {...field} />
+											<Input {...field} type="email" />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -97,8 +109,16 @@ const login = () => {
 									</FormItem>
 								)}
 							></FormField>
+							<div className="flex items-center space-x-2">
+								<Checkbox id="remember" />{" "}
+								<label
+									htmlFor="remember"
+									className="text-sm cursor-pointer"
+								>
+									Remember me
+								</label>
+							</div>
 							<Button
-								variant="default"
 								type="submit"
 								className="w-full"
 								disabled={form.formState.isSubmitting}
@@ -106,24 +126,27 @@ const login = () => {
 								{form.formState.isSubmitting && (
 									<Loader2 className="animate-spin" />
 								)}
-								Submit
+								Login
 							</Button>
 						</form>
-						<div className="flex items-center">
-							Doesn't have account?
-							<Link to="/auth/signup">
-								<Button
-									variant="link"
-									className="mx-0 px-1 text-blue-500"
-								>
-									Sign Up
-								</Button>
+						<p className="text-sm text-shadow-background">
+							Don’t have an account?{" "}
+							<Link to="/auth/signup" className="underline">
+								Sign Up
 							</Link>
-						</div>
+						</p>
 					</Form>
-				</CardContent>
-			</Card>
-		</main>
+				</div>
+			</main>
+			<section className="mix-blend-luminosity rounded-l-xl overflow-hidden relative">
+				<div className="bg-slate-950 absolute inset-0 opacity-60"></div>
+				<img
+					src={bg}
+					alt=""
+					className="w-full h-full size-fit object-center object-cover"
+				/>
+			</section>
+		</Wrapper>
 	);
 };
 
