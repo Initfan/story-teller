@@ -2,6 +2,7 @@ import { Button } from "./ui/button";
 import logo from "../assets/images/mythia-logo.png";
 import { useCookies } from "react-cookie";
 import { Link, NavLink } from "react-router";
+import SignOut from "./signout";
 
 const Navigation = () => {
 	const [cookies] = useCookies(["user"]);
@@ -23,6 +24,7 @@ const Navigation = () => {
 					<NavLink to="/profile/name">
 						<Button variant="link">Profile</Button>
 					</NavLink>
+					<SignOut />
 				</div>
 			)}
 			{!cookies.user && (

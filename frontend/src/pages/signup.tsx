@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import logo from "../assets/images/mythia-logo.png";
+import bg from "../assets/images/sci-fi.jpg";
 import {
 	Form,
 	FormControl,
@@ -15,6 +16,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router";
 import { Loader2 } from "lucide-react";
+import Wrapper from "@/components/wrapper";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
 	name: z
@@ -52,27 +56,34 @@ const signup = () => {
 	};
 
 	return (
-		<main className="w-2/3 mx-auto flex h-screen items-center justify-center">
-			<Card className="w-full max-w-sm ">
-				<CardContent>
-					<h1 className="text-2xl text-center mb-4">
-						Sign Up to <span className="font-bold">Mythia</span>
+		<Wrapper Bg={false} className="w-full! grid grid-cols-2 h-screen">
+			<main className="p-8 relative">
+				<div className="flex items-center justify-between absolute inset-x-0 px-8">
+					<div className="flex items-center space-x-3">
+						<img src={logo} className="w-12" />
+						<h2 className="text-lg font-semibold">Mythia</h2>
+					</div>
+					<ModeToggle />
+				</div>
+				<div className="flex flex-col justify-center items-center space-y-8 h-full">
+					<h1 className="text-3xl">
+						Sign Up to <span className="font-semibold">Mythia</span>
 					</h1>
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
-							className="space-y-4"
+							className="w-1/2 space-y-3"
 						>
 							<FormField
 								name="name"
 								control={form.control}
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel htmlFor="username">
+										<FormLabel htmlFor="name">
 											Username
 										</FormLabel>
 										<FormControl>
-											<Input {...field} />
+											<Input {...field} type="name" />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -87,7 +98,7 @@ const signup = () => {
 											Email
 										</FormLabel>
 										<FormControl>
-											<Input {...field} />
+											<Input {...field} type="email" />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -108,8 +119,23 @@ const signup = () => {
 									</FormItem>
 								)}
 							></FormField>
+							<div className="flex space-x-2">
+								<Checkbox id="remember" className="mt-1" />
+								<label
+									htmlFor="remember"
+									className="text-sm cursor-pointer "
+								>
+									I agree to the{" "}
+									<span className="text-blue-500">
+										Terms and Policies
+									</span>{" "}
+									and{" "}
+									<span className="text-blue-500">
+										Privacy Policy
+									</span>
+								</label>
+							</div>
 							<Button
-								variant="default"
 								type="submit"
 								className="w-full"
 								disabled={form.formState.isSubmitting}
@@ -117,24 +143,27 @@ const signup = () => {
 								{form.formState.isSubmitting && (
 									<Loader2 className="animate-spin" />
 								)}
-								Submit
+								Register
 							</Button>
 						</form>
-						<div className="flex items-center">
-							Already have account?
-							<Link to="/auth/signin">
-								<Button
-									variant="link"
-									className="mx-0 px-1 text-blue-500"
-								>
-									Sign In
-								</Button>
+						<p className="text-sm text-shadow-background">
+							Already have an account?{" "}
+							<Link to="/auth/signin" className="underline">
+								Sign In
 							</Link>
-						</div>
+						</p>
 					</Form>
-				</CardContent>
-			</Card>
-		</main>
+				</div>
+			</main>
+			<section className="mix-blend-luminosity rounded-l-xl overflow-hidden relative">
+				<div className="bg-slate-950 absolute inset-0 opacity-60"></div>
+				<img
+					src={bg}
+					alt=""
+					className="w-full h-full size-fit object-center object-cover"
+				/>
+			</section>
+		</Wrapper>
 	);
 };
 
