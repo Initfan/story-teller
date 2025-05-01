@@ -36,6 +36,8 @@ const App = () => {
 		setLoading((p) => !p);
 	};
 
+	console.log(cookies.user);
+
 	return (
 		<Wrapper>
 			<form
