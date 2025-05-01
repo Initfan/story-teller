@@ -1,8 +1,18 @@
 import { Button } from "@/components/ui/button";
 import bg from "../assets/images/sci-fi.jpg";
-import Navigation from "@/components/navigation";
+import Navigation from "@/components/Navigation";
+import { useCookies } from "react-cookie";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 const LandingPage = () => {
+	const [cookies] = useCookies(["user"]);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (cookies.user) navigate("/mythia");
+	}, [cookies, navigate]);
+
 	return (
 		<main className="w-[90%] mx-auto z-10">
 			<div className="h-screen absolute inset-0 -z-10 overflow-hidden mix-blend-overlay">

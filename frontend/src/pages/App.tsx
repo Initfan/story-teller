@@ -2,10 +2,10 @@ import { FormEvent, useState } from "react";
 import { Button } from "../components/ui/button";
 import { MultiSelect } from "../components/multi-select";
 import { Link, useLoaderData, useNavigate } from "react-router";
-import Wrapper from "@/components/wrapper";
 import { Loader2 } from "lucide-react";
 import { useCookies } from "react-cookie";
 import SignOut from "@/components/signout";
+import Navigation from "@/components/Navigation";
 
 const App = () => {
 	const [selectedGenre, setSelectedGenre] = useState<string[]>();
@@ -37,10 +37,11 @@ const App = () => {
 	};
 
 	return (
-		<Wrapper>
+		<main className="w-[90%] mx-auto z-10">
+			<Navigation />
 			<form
 				onSubmit={onSubmit}
-				className="flex justify-center items-center"
+				className="justify-center items-center hidden"
 			>
 				<div className="space-y-4 text-center flex flex-col items-center">
 					<h1 className="text-5xl">Mythia</h1>
@@ -80,7 +81,7 @@ const App = () => {
 					)}
 				</div>
 			</form>
-		</Wrapper>
+		</main>
 	);
 };
 

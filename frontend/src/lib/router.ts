@@ -6,6 +6,7 @@ import signup from "@/pages/signup";
 import { appLoader, storyLoader } from "./loader";
 import { generateStory } from "./action";
 import LandingPage from "@/pages/LandingPage";
+import App from "@/pages/App";
 
 const router = createBrowserRouter([
 	{
@@ -15,8 +16,12 @@ const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
-				loader: appLoader,
 				Component: LandingPage,
+			},
+			{
+				path: "/mythia",
+				Component: App,
+				loader: appLoader,
 			},
 			{
 				path: "/story/:id",

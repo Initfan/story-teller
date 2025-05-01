@@ -3,11 +3,7 @@ import logo from "../assets/images/mythia-logo.png";
 import { useCookies } from "react-cookie";
 import { Link } from "react-router";
 
-interface props {
-	userMenu?: boolean;
-}
-
-const Navigation = ({ userMenu = false }: props) => {
+const Navigation = () => {
 	const [cookies] = useCookies(["user"]);
 
 	return (
@@ -16,8 +12,11 @@ const Navigation = ({ userMenu = false }: props) => {
 				<img src={logo} className="w-14" />
 				<h2 className="md:text-2xl text-xl font-semibold">Mythia</h2>
 			</div>
-			{userMenu}
-			{cookies.user && <p>Hello welcome back, {cookies.user.name}</p>}
+			{cookies.user && (
+				<Button className="bg-purple-500 hover:bg-purple-600 text-white">
+					Buat Cerita
+				</Button>
+			)}
 			{!cookies.user && (
 				<div className="flex items-center space-x-3">
 					<Link to="/auth/signin">
